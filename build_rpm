@@ -1,0 +1,71 @@
+#!/bin/bash
+
+SANDBOX_NAME=$2
+
+declare -r maintainerName="Alexander Makeenkov"
+declare -r maintainerMail="amakeenk@altlinux.org"
+
+declare -r dirSandBoxTopOrig="${HOME}/hsh-sandboxes/$SANDBOX_NAME"
+declare -r dirSandBoxTop="/tmp/.private/amakeenk/hsh-sandboxes/$SANDBOX_NAME"
+declare -r dirSandBoxHasher="${dirSandBoxTop}/hasher"
+
+declare -r archTarget=`echo $SANDBOX_NAME | awk -F"-" '{print $3}'`
+
+function showDoc {
+    cat "${0}"
+}
+
+[ "${#}" == 0 ] \
+    && showDoc \
+    && exit 1
+
+cliArgument="${1}"
+cliOptionName="${cliArgument%%=*}"
+cliOptionName="${cliOptionName#--}"
+cliOptionValue="${cliArgument#*=}"
+
+mkdir -p "${dirSandBoxHasher}"
+cp -r "${dirSandBoxTopOrig}/"* "${dirSandBoxTop}"
+
+case "${cliOptionName}" in
+shell|sh)
+    hsh-shell --mountpoints="/proc" "${dirSandBoxHasher}"
+;;
+build|bu)
+    gear \
+	--verbose \
+	--commit \
+	--hasher \
+	-- ${archTarget} \
+	hsh \
+	    --verbose \
+	    --nprocs=16 \
+	    --packager="${maintainerName} <${maintainerMail}>" \
+	    ${argNoCheck} \
+	    --target=${archTarget} \
+	    --lazy-cleanup \
+	    --mountpoints="/proc,/dev/pts,/sys" \
+	    --apt-config="${dirSandBoxTop}/apt.conf" \
+	    "${dirSandBoxHasher}"
+;;
+rebuild|reb|rebu)
+    gear \
+	--verbose \
+	--commit \
+	--hasher \
+	-- ${archTarget} \
+	hsh-rebuild \
+	    --verbose \
+	    ${argNoCheck} \
+	    --target=${archTarget} \
+	    --mountpoints="/proc,/dev/pts,/sys" \
+	    "${dirSandBoxHasher}"
+;;
+install|ins)
+    shift 1
+    hsh-install "${dirSandBoxHasher}" "${@}"
+;;
+clean-all)
+    hsh --cleanup-only "${dirSandBoxHasher}"
+;;
+esac
