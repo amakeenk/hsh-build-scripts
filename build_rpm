@@ -1,71 +1,39 @@
 #!/bin/sh -e
 
+hsh_action=$1
 sandbox_name=$2
 
-declare -r maintainerName="Alexander Makeenkov"
-declare -r maintainerMail="amakeenk@altlinux.org"
+maintainer_name="Alexander Makeenkov"
+maintainer_mail="amakeenk@altlinux.org"
+sandbox_dir="${HOME}/hsh-sandboxes/${sandbox_name}"
+sandbox_dir_tmp="${TMP}/hsh-sandboxes/${sandbox_name}"
+sandbox_dir_tmp_hasher="${sandbox_dir_tmp}/hasher"
+arch=`echo ${sandbox_name} | awk -F"-" '{print $3}'`
 
-declare -r dirSandBoxTopOrig="${HOME}/hsh-sandboxes/${sandbox_name}"
-declare -r dirSandBoxTop="${TMP}/hsh-sandboxes/${sandbox_name}"
-declare -r dirSandBoxHasher="${dirSandBoxTop}/hasher"
+if [ -z ${hsh_action} ] || [ -z ${sandbox_name} ]; then
+	echo "Usage: $0 --hsh-action sandbox-name"
+	echo "Where hsh-action is: build, rebuild or clean-all"
+	exit 1
+fi
 
-declare -r archTarget=`echo ${sandbox_name} | awk -F"-" '{print $3}'`
+mkdir -p "${sandbox_dir_tmp_hasher}"
+cp -r "${sandbox_dir}/"* "${sandbox_dir_tmp}"
 
-function showDoc {
-    cat "${0}"
-}
-
-[ "${#}" == 0 ] \
-    && showDoc \
-    && exit 1
-
-cliArgument="${1}"
-cliOptionName="${cliArgument%%=*}"
-cliOptionName="${cliOptionName#--}"
-cliOptionValue="${cliArgument#*=}"
-
-mkdir -p "${dirSandBoxHasher}"
-cp -r "${dirSandBoxTopOrig}/"* "${dirSandBoxTop}"
-
-case "${cliOptionName}" in
-shell|sh)
-    hsh-shell --mountpoints="/proc" "${dirSandBoxHasher}"
+case "${hsh_action}" in
+--build)
+    gear --verbose --commit --hasher -- ${arch} \
+		hsh --verbose --nprocs=16 --packager="${maintainer_name} <${maintainer_mail}>" \
+		--target=${arch} --lazy-cleanup --mountpoints="/proc,/dev/pts,/sys" \
+	    --apt-config="${sandbox_dir_tmp}/apt.conf" "${sandbox_dir_tmp_hasher}"
 ;;
-build|bu)
-    gear \
-	--verbose \
-	--commit \
-	--hasher \
-	-- ${archTarget} \
-	hsh \
-	    --verbose \
-	    --nprocs=16 \
-	    --packager="${maintainerName} <${maintainerMail}>" \
-	    ${argNoCheck} \
-	    --target=${archTarget} \
-	    --lazy-cleanup \
-	    --mountpoints="/proc,/dev/pts,/sys" \
-	    --apt-config="${dirSandBoxTop}/apt.conf" \
-	    "${dirSandBoxHasher}"
+--rebuild)
+    gear --verbose --commit --hasher -- ${arch} \
+		hsh-rebuild --verbose --target=${arch} --mountpoints="/proc,/dev/pts,/sys" "${sandbox_dir_tmp_hasher}"
 ;;
-rebuild|reb|rebu)
-    gear \
-	--verbose \
-	--commit \
-	--hasher \
-	-- ${archTarget} \
-	hsh-rebuild \
-	    --verbose \
-	    ${argNoCheck} \
-	    --target=${archTarget} \
-	    --mountpoints="/proc,/dev/pts,/sys" \
-	    "${dirSandBoxHasher}"
+--clean-all)
+    hsh --cleanup-only "${sandbox_dir_tmp_hasher}"
 ;;
-install|ins)
-    shift 1
-    hsh-install "${dirSandBoxHasher}" "${@}"
-;;
-clean-all)
-    hsh --cleanup-only "${dirSandBoxHasher}"
+*) echo -e "ERROR: $1 is wrong option"
+    exit 1
 ;;
 esac
