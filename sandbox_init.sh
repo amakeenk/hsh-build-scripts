@@ -11,14 +11,11 @@ repo_arch=$(echo ${sandbox_name} | awk -F"-" '{print $3}')
 
 path_to_repo="/ftppool/private/${repo_name}/last"
 
-cd ${HOME}/hsh-sandboxes
-mkdir ${sandbox_name}
+sandbox_path="${HOME}/hsh-sandboxes/${sandbox_name}"
 
-cd ${sandbox_name}
-mkdir hasher tmp
-touch apt.conf priorities sources.list
+mkdir -p ${sandbox_path}/{hasher,tmp}
 
-cat > priorities <<EOF
+cat > ${sandbox_path}/priorities <<EOF
 Important:
     basesystem
     altlinux-release-${repo_name}
@@ -26,7 +23,7 @@ Required:
     apt
 EOF
 
-cat > apt.conf <<EOF
+cat > ${sandbox_path}/apt.conf <<EOF
 Dir::Etc::main /dev/null;
 Dir::Etc::parts /var/empty;
 Dir::Etc::sourcelist ${HOME}/hsh-sandboxes/${sandbox_name}/sources.list;
@@ -35,13 +32,13 @@ Dir::Etc::sourceparts /var/empty;
 EOF
 
 if [ ${repo_arch} == "x86_64" ]; then
-cat > sources.list <<EOF
+cat > ${sandbox_path}/sources.list <<EOF
 rpm file:${path_to_repo} x86_64 classic
 rpm file:${path_to_repo} x86_64-i586 classic
 rpm file:${path_to_repo} noarch classic
 EOF
 else
-cat > sources.list <<EOF
+cat > ${sandbox_path}/sources.list <<EOF
 rpm file:${path_to_repo} i586 classic
 rpm file:${path_to_repo} noarch classic
 EOF
