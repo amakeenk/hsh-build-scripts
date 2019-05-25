@@ -14,6 +14,7 @@ repo_arch=$(echo ${sandbox_name} | awk -F"-" '{print $3}')
 
 sandbox_path="${HOME}/hsh-sandboxes/${sandbox_name}"
 
+mkdir -p ${HOME}/hasher
 mkdir -p ${sandbox_path}/{hasher,tmp}
 
 cat > ${sandbox_path}/priorities <<EOF

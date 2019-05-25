@@ -13,6 +13,7 @@ path_to_repo="/ftppool/private/${repo_name}/last"
 
 sandbox_path="${HOME}/hsh-sandboxes/${sandbox_name}"
 
+mkdir -p ${HOME}/hasher
 mkdir -p ${sandbox_path}/{hasher,tmp}
 
 cat > ${sandbox_path}/priorities <<EOF
