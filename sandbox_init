@@ -39,7 +39,7 @@ rpm ${path_to_repo} x86_64 classic
 rpm ${path_to_repo} x86_64-i586 classic
 rpm ${path_to_repo} noarch classic
 
-#rpm-dir file:/local_repo/p8 x86_64 dir
+#rpm-dir file:/local_repo x86_64 dir
 EOF
 else
 cat > ${sandbox_path}/sources.list <<EOF
