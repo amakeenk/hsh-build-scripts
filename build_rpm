@@ -13,8 +13,8 @@ sandbox_dir_tmp_hasher="${sandbox_dir_tmp}/hasher"
 build_arch=$(echo ${sandbox_name} | awk -F"-" '{print $3}')
 
 if [ -z ${hsh_action} ] || [ -z ${sandbox_name} ]; then
-	echo "Usage: $0 --hsh-action sandbox-name"
-	echo "Where hsh-action is: build, rebuild or clean-all"
+	echo "Usage: $0 --hsh-action [build|rebuild|clean-all] sandbox-name"
+	echo "Where sandbox-name like repo-pkgname-arch"
 	exit 1
 fi
 
