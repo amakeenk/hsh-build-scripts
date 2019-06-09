@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/bash -e
 
 hsh_action=$1
 sandbox_name=$2
@@ -17,6 +17,8 @@ if [ -z ${hsh_action} ] || [ -z ${sandbox_name} ]; then
 	echo "Where sandbox-name like repo-pkgname-arch"
 	exit 1
 fi
+
+[ -d ${sandbox_dir} ] || sandbox_init ${sandbox_name}
 
 mkdir -p ${sandbox_dir_tmp_hasher}
 cp -r ${sandbox_dir}/* ${sandbox_dir_tmp}
