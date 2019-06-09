@@ -3,8 +3,8 @@
 hsh_action=$1
 sandbox_name=$2
 
-maintainer_name="Alexander Makeenkov"
-maintainer_mail="amakeenk@altlinux.org"
+maintainer_name=$(git config --global --list | grep user.name | cut -d"=" -f2)
+maintainer_mail=$(git config --global --list | grep user.email | cut -d"=" -f2)
 
 sandbox_dir="${HOME}/hsh-sandboxes/${sandbox_name}"
 sandbox_dir_tmp="${TMP}/hsh-sandboxes/${sandbox_name}"
