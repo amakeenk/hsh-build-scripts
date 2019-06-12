@@ -18,7 +18,7 @@ if [ -z ${hsh_action} ] || [ -z ${sandbox_name} ]; then
 	exit 1
 fi
 
-[ -d ${sandbox_dir} ] || sandbox_init ${sandbox_name}
+[ -d ${sandbox_dir} ] || sandbox-init ${sandbox_name}
 
 mkdir -p ${sandbox_dir_tmp_hasher}
 cp -r ${sandbox_dir}/* ${sandbox_dir_tmp}
