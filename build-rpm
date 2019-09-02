@@ -26,7 +26,7 @@ cp -r ${sandbox_dir}/* ${sandbox_dir_tmp}
 case "${hsh_action}" in
 	--build)
 		gear --verbose --commit --hasher -- ${build_arch} \
-			hsh --verbose --packager="${maintainer_name} <${maintainer_mail}>" \
+			hsh --verbose --nprocs=1 --packager="${maintainer_name} <${maintainer_mail}>" \
 			--target=${build_arch} --lazy-cleanup --mountpoints="/proc,/dev/pts,/sys" \
 			--apt-config="${sandbox_dir_tmp}/apt.conf" "${sandbox_dir_tmp_hasher}"
 	;;
